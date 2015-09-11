@@ -91,14 +91,8 @@ module Enumerable
 
 		x = []
 
-		if block_given?  # block and proc		
-			self.my_each do |i|			
-				x.push( my_proc.call(yield(i)) )
-			end			
-		else	# just the block
-			self.my_each do |i|
-				x.push( my_proc.call(i) )
-			end
+		self.my_each do |i|
+			x.push (my_proc.call(block_given? ? yield(i) : i))
 		end
 
 		x
