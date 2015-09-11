@@ -23,7 +23,39 @@ describe "My Enumeration Functions" do
 	end
 
 	describe "#my_each_with_index" do
-		# TODO
+
+		it "should give both item and index" do
+
+			expected_result =  "item is a and index is 0\n"
+			expected_result += "item is b and index is 1\n"
+			expected_result += "item is c and index is 2\n"
+
+			expect{ ['a','b','c'].my_each_with_index do |item, index|
+				puts "item is #{item} and index is #{index}" 
+			end }.to output(expected_result).to_stdout
+
+		end
+
+		it "should work with words" do # apidock example
+			hash = Hash.new
+			%w(cat dog wombat).my_each_with_index {|item, index|
+			  hash[item] = index
+			}
+			
+			hash.should == {"cat"=>0, "dog"=>1, "wombat"=>2}
+		end
+
+		# TODO:  Currently fails because my_each_with_index is calling length.
+		#it "should work with ranges" do
+		#	
+		#	expected_result =  "item is 1 and index is 0\n"
+		#	expected_result += "item is 2 and index is 1\n"
+		#	expected_result += "item is 3 and index is 2\n"
+
+		#	expect{ (1..3).my_each_with_index do |item, index|
+		#		puts "item is #{item} and index is #{index}" 
+		#	end }.to output(expected_result).to_stdout
+		#end
 	end
 
 	describe "#my_select" do
@@ -63,7 +95,13 @@ describe "My Enumeration Functions" do
 		end
 
 		it "should return true if no block is given and at least one of the members is not false or nil" do
-			#TODO
+			[nil, true, 99].my_any?.should == true
+			[nil, 1, 99].my_any?.should == true
+			[0].my_any?.should == true # 0 is considered "truthy" in Ruby
+		end
+
+		it "should return false if no block is given and the only members it has are false or nil" do
+			[nil, false, nil].my_any?.should == false
 		end
 
 	end
@@ -84,9 +122,8 @@ describe "My Enumeration Functions" do
 			[nil, false].my_none?.should == true
 		end
 
-		it "should return false if no block is given and some collection member is true" do
-			# TODO:  There is  failure here that needs to be fixed		
-			#[nil, "hello", false].my_none?.should == false
+		it "should return false if no block is given and some collection member is true" do				
+			[nil, "hello", false].my_none?.should == false
 		end
 
 	end
@@ -117,6 +154,12 @@ describe "My Enumeration Functions" do
 		it "should work for multiplication" do
 			array = [2,4,5]
 			array.my_inject{|product,n| product*n}.should == 40
+		end
+	end
+
+	describe "#multiply_els" do
+		it "should multiply array of elements" do
+			multiply_els([10,3,-1,0.5]).should == -15
 		end
 	end
 
