@@ -76,13 +76,49 @@ module Enumerable
 		x			
 	end
 
+	# Modify your #my_map method to take a proc instead.
+	def my_mappy(my_proc)
+		x = []
+			self.my_each do |i|			
+				x.push( my_proc.call(i) )
+			end
+		x	
+	end
+
+	# Modify your #my_map method to take either a proc or a block, executing the block only if both are supplied
+	# (in which case it would execute both the block AND the proc).
+	def my_mappy_block_and_proc(my_proc)
+
+		x = []
+
+		if block_given?  # block and proc		
+			self.my_each do |i|			
+				x.push( my_proc.call(yield(i)) )
+			end			
+		else	# just the block
+			self.my_each do |i|
+				x.push( my_proc.call(i) )
+			end
+		end
+
+		x
+	end
+
 	def my_inject
-		
+		m = self[0]
+		copy = self.clone # create a copy otherwise shift will mess up the original
+		copy.shift
+		copy.my_each do |n|
+			m = yield(m,n)
+		end
+		m
 	end
 
 end
 
-
+def multiply_els(array)
+	return array.my_inject{|product,n| product*n}
+end
 
 # test my_each
 [1,2,3].my_each { |n| puts "Got #{n}" }
@@ -129,4 +165,23 @@ e = (1..4).my_map
 puts e.inspect
 puts e.select { |obj| obj.is_a?(Integer) }.inspect
 
+# test my_inject
+my_array = [1,2,4]
+puts my_array.my_inject{|sum, n| sum+n}.inspect
+puts my_array.inspect #ensure array not modified
+
+# test the multiply elements function which calls inspect to do multiplication
+puts multiply_els([2,4,5]).inspect # => 40
+
+#test my_map_with_proc
+cube_it = Proc.new do |v|
+	v*v*v
+end
+
+puts [1,2,3].my_mappy(cube_it).inspect # => [1, 8, 27]
+
+puts [1,2,3].my_mappy_block_and_proc(cube_it).inspect + " expect [1, 8, 27]" #call w/o block
+puts [1,2,3].my_mappy_block_and_proc(cube_it){ |x| x + 1 }.inspect + " expect [8, 27, 64]"
+
+#puts [1,2,3].map(cube_it){ |x| x+1 }.inspect
 
